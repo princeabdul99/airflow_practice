@@ -1,3 +1,4 @@
+
 Overview
 ========
 
@@ -63,3 +64,67 @@ Set up and Run an Airflow Project
     - The requirements.txt file: Specifies additional Python packages to install, along with their versions, to extend the functionality of the Airflow environment.
 - The Astro CLI can be used to run an Airflow project. To start an Airflow project with the Astro CLI, use the command astro dev start. To restart the project, use astro dev restart, and to stop the project, use the command astro dev stop.
 - To get Airflow to work with VSCode and provide benefits like correct syntax highlighting and autocompletion, the VSCode instance must be run inside of the docker container using the Dev Containers extension.
+
+
+DBT
+========
+
+
+Airflow Variables
+key = insurance_claims_dag_settings
+value = {
+    "gcs_source_data_bucket":"[YOUR GCP PROJECT ID]-bucket", 
+    "dev_bronze_dataset":"ic_dev_bronze",
+    "dev_silver_dataset":"ic_dev_silver",
+    "dev_gold_dataset":"ic_dev_gold"
+}
+
+data quality check
+SELECT
+    COUNT(*) AS total_rows,
+    COUNT(DISTINCT id) AS unique_id,
+    SUM(CASE WHEN id IS NULL THEN 1 ELSE 0 END) AS null_ids
+FROM table;    
+
+astro dev start
+astro dev restart
+astro dev stop
+
+Ensure data platform is connected (DBT)
+dbt compile              | dbtf compile
+dbt run                  | dbtf run
+dbt clean                | dbtf clean
+dbt run --full-refresh   | dbtf run --full-refresh  
+
+dbtf test -s claims_payment
+dbtf run-operation generate_model_yaml --args '{"model_names": ["claims_payment"]}'
+dbtf run-operation generate_base_model --args '{"source_name": "ic_bronze", "table_name": "claims_reserves" }'
+
+install.ps1: Run 'dbt --help' to get started
+Usage: dbt.exe [OPTIONS] <COMMAND>
+
+  init           Initialize a new dbt project
+  deps           Install package dependencies
+  parse          Parse models
+  list           List selected nodes
+  ls             List selected nodes (alias for list)
+  compile        Compile models
+  run            Run models
+  run-operation  Run the named macro with any supplied arguments
+  test           Test models
+  seed           Seed models
+  snapshot       Run snapshot models
+  show           Show a preview of the selected nodes
+  build          Build seeds, models and tests
+  clean          Remove target directories
+  source         Run sources subcommands
+  clone          Create clones of selected nodes
+  system         dbt installation configuration
+  man            Create reference documentation
+  debug          Profile connection debugging
+  retry          Retry failed nodes from the previous run
+  pull                  Pull and materialize input data from remote warehouse
+  sl             Semantic Layer commands
+  help           Print this message or the help of the given subcommand(s)
+
+Use `dbt <COMMAND> --help` to learn more about the options for each command.                 
